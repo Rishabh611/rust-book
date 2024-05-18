@@ -43,3 +43,76 @@
 ### Ownership of Struct Data
 
 Check later.
+
+## An example program using Structs
+- [Example](/CH-5/ex-9-area-of-rectangle/src/main.rs)
+- Structs add more meaning to our program
+```
+let rec1 = Rectangle{
+    width: 30,
+    height: 40,
+};
+println!("rect1 is {}", rect1);
+```
+- this will thow error. 
+- `error[E0277]: `Rectangle` doesn't implement `std::fmt::Display``
+- Primitives implement Display by default because there is only one way to show them
+- But with structs, the way `prinln!()` should format the output is less clear because there are more display possibilities.
+- Rust does not want to guess what we want, and structs don't have a provided implementation of `Display` to use with `println!()` and the {} placeholder
+- we can change the println to `println!("rect1 is {:?}")`.
+- putting the specifier `:?` inside the curly brackets tells `println!` we want to use an output format called `Debug`.
+- We still get an error. We need to explicitly opt in to make the Debugging functionality available to us.
+- we need to add the outer attribute `#[derive(Debug)]` just before struct definition.
+- when we have large struct, it's useful to have output that's a bit easier to read. In those case we can use `{:#?}`
+- Another way to print out a value using `Debug` format is to use the `dbg!` macro which takes ownership of an expression, prints the file aand line number whre that `dbg!` macro call occurs in our code along wit the resultant value of that expression.
+
+## Method Syntax
+- Method are similar to functions :we declare them with the `fn` keyword and a name, they can have parameters and a return value.
+
+### Defining Methods
+```
+imply Rectangle{
+    fn area(&self)->u32{
+        self.width * self.height
+    };
+}
+```
+- We start with `impl` block for `Rectangle`. 
+- Every thing within `impl` block will be associated with the `Rectangle` type. 
+- We change the first paramerter to be `self` in the sifnature and everywhere in the body. 
+- We use `&self` instead for `rectangle: &Rectangle`. 
+- The `&self` is actually short for `self:&self`. 
+- within impl block, the type `Self` is an alear for the type that the impl block is for.
+- Method must have a parameter named `self` of type `Self` for their first parameter. So Rust lets you abbreviate this with only the name `self`.
+- We used `&self` because we don't want to take ownership and we just want to read data in the struct not write to it.
+- if we wanted to change the instance that we've called the method as part of what the method does, we'd use `&mut self` as the first parameter.
+- main reason for using method instead for function is for organization.
+
+### Method with more parameters
+- Method to compare a rectangle with another
+```
+impl Rectangle{
+    fn can_hold(&self, other: &Rectangle)->bool{
+        self.width > other.width && self.height > other.height
+    }
+}
+```
+
+### Associated functions
+- All function defines within a `impl` block are called `Associated function` because they're associated with the type name after the `impl`.
+- we can define associated function that don't have `self` as their first parameter because they don't need an instance of the type to work with.
+- Associated function that aren't methods are used often for constructors that will return a new instance of the struct. 
+```
+impl Rectangle{
+    fn square(size: u32)->Self{
+        Self {
+            width: size,
+            height: size,
+        }
+    }
+}
+```
+- The Self keyword in thereturn type and in the body of the function are aliases for the type that appears after the `impl` keyword.
+- To call these function, we use the `::` syntax with the struct. 
+- The `::` syntax is used for both associated functions and namespaces created by modules.
+

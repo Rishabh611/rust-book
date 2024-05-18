@@ -1,6 +1,5 @@
-workspace = { members = [ "CH-5/ex-10","CH-5/ex-9-area-of-rectangle"] }
 [package]
-name = "rust-book"
+name = "ex-10"
 version = "0.1.0"
 edition = "2021"
 

@@ -3,5 +3,13 @@
 version = 3
 
 [[package]]
+name = "ex-10"
+version = "0.1.0"
+
+[[package]]
+name = "ex-9-area-of-rectangle"
+version = "0.1.0"
+
+[[package]]
 name = "rust-book"
 version = "0.1.0"
