@@ -101,3 +101,122 @@ let y: Option<i8> = Some(5);
 let sum = x + y; // this won't compile
 ```
 - we would have to convert an `Option<T>` to `T` before you can perform operation with it.
+
+## the match control flow construct
+- `match` allows you to compare a value against a series of pattern and then execute code based on which pattern matches
+```rust
+enum coin{
+    Penny,
+    Nickel,
+    Dime,
+    Quater,
+}
+fn value_in_cents(coin: Coin){
+    match coin{
+        Coin::Penny=>1,
+        Coin::Nickel=>2,
+        Coin::Dime=>10,
+        Coin::Quater=>25,
+    }
+}
+```
+- Difference with `if`: `if` requires the values to be boolean, but here it can be any value.
+- `match` arms:
+    - An arm has two parts: a pattern and some code
+    - `=>` operater separates the pattern and the code
+```rust
+fn value_in_cents(coin: Coin){
+    match coin{
+        Coin::Penny=>{
+            println!("Lucky penny");
+            1
+        }
+        Coin::Nickel=>5,
+        Coin::Dime=>10,
+        Coin::Quater=>25,
+    }
+}
+```
+### Patterns that bind to values
+```rust
+enum UsState{
+    Alabama,
+    Alaska,
+}
+enum Coin{
+    Penny,
+    Nickel,
+    Dime,
+    Quater(UsState),
+}
+```
+- each US state will have a different Design for Quater, we want to store state value inside `Quater`
+```rust
+fn value_in_cents(coin: Coin){
+    match coin{
+        Coin::Penny=>1,
+        Coin::Nickel=>5,
+        Coin::Dime=>10,
+        Coin::Quater(state)=>{
+            println!("State Quater from {:?}", state),
+        },
+    }
+}
+```
+### Matching with `Option<T>`
+```rust
+fn plus_one(x: Option<i32>)-> Option<i32>{
+    match x{
+        None=> None,
+        Some(i)=> Some(i+1),
+    }
+}
+let five = Some(5);
+let six = plus_one(five);
+let none = plus_one(None);
+```
+### Matches are exhaustive
+- the arms patterns must cover all possibilitees. Otherwise we'll get error.
+```rust
+fn plus_one(x:Option<i32>)-> Option<i32>{
+    match x {
+        Some(i) => Some(i+1),
+    }
+}
+```
+- we didn't handle the `None` case, so this  code will cause a bug. It's a bug Rust knows how to catch.
+- If we compile this code we will get get error.
+- Rust knows that we didn't cover every possible case, an even knows which pattern we forgot.
+- Matches in Rust are exhaustive, we must exhaust every last possibility in order for the code to be valid.
+
+### Catch-all Patterns and the _ Placeholder
+- we can also take special actions for a few particular value, but for all other values take one default action.
+```rust
+let dice_roll = 9;
+match dice_roll {
+    3 => add_fancy_hat(),
+    7 => remove_fancy_hat(),
+    other => move_player(other),
+}
+fn add_fancy_hat(){}
+fn remove_fancy_hat(){}
+fn move_player(num_spaces: u8){}
+```
+- the last pattern will match all values not specifically listed. 
+- this catch-all pattern meets the requirement that `match` must be exhaustive.
+- Rust also has a pattern we can use when we want a catch-all but don't want to use the value in the catch-all pattern: `_` is a special pattern that matches any values and does not bind to that value.
+- this tells rust we aren't going to use the value, so Rust won't warn us about an unused variable.
+```rust
+let dice_roll = 9;
+match dice_roll{
+    3 => add_fancy_hat(),
+    7 => remove_fancy_hat(),
+    _ => reroll(),
+}
+fn add_fancy_hat(){}
+fn remove_fancy_hat(){}
+fn reroll(){}
+```
+
+## Concise Control flow with `if let`
+- combines `if`
