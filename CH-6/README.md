@@ -16,7 +16,7 @@ enum IpAddrKind{
 let four = IpAddrKind::V4;
 let six = IpAddrKind::V6;
 ```
-- variants of rnum are namespaces under it's identifies, and we use a double colon to separate the tow.
+- variants of enum are namespaces under it's identifies, and we use a double colon to separate the tow.
 - we can define a function that takes any IpAddrKind:
 ``` rust
 fn route(ip_kind: IpAddrKind){
@@ -72,7 +72,7 @@ m.call()
 - `Option` type encodes the very common scenario in which a value could be something or it could be nothing.
 - Example: if you request the first item in a non-empty, you would get a value. if you request the first item in an empty list, you would get nothing.
 - Rust does not have the null feature that many other languages have.
-- the porblem with null values is that if you try to use a null value as a not-null value, you'll get an error of some kind. because this null or not-null rpoperty is pervasive, it's extremly easy to make this kind of error.
+- the problem with null values is that if you try to use a null value as a not-null value, you'll get an error of some kind. because this null or not-null property is pervasive, it's extremly easy to make this kind of error.
 - Rust does not have nulls, but it does have an enum that can encode the concept of vaalue being present or absent. This enum is Option<T>
 ```rust
 enum Option<T>{
@@ -92,7 +92,7 @@ let absent_number: Option<i32> = None;
 - the `some_number` is `Option<i32>`
 - the `some_char` is `Option<char>`
 - Rust can infer these types because we've specified a value inside the `Some` variant.
-- for `absent_number` Rust requires us to annotate the overall `Option` type: the compiler can't infer the type that the corresponding `Some` variant will hold by looking only at a `None` value. here we teell Rusr we mean type of `Option<i32>`
+- for `absent_number` Rust requires us to annotate the overall `Option` type: the compiler can't infer the type that the corresponding `Some` variant will hold by looking only at a `None` value. here we tell Rust we mean type of `Option<i32>`
 - `Option<T>` and `T` are different types, the compiler wont' let us use an `Option<T>` values as if it were definitely a valid value.
 ```rust
 let x: i8 = 5;
@@ -219,4 +219,45 @@ fn reroll(){}
 ```
 
 ## Concise Control flow with `if let`
-- combines `if`
+- combines `if` and `let` into a less verbose way to handle values the match one pattern while ignoring the rest.
+```rust
+let config_max = Some(3u8);
+match config_max {
+    Some(max)=>println!("The maximum is configured to be {}", max),
+    _ => (),
+}
+```
+- if the value is `Some` we print out out the value in  `Some` variant by binding the value to the variable `max` in the pattern.
+- We don't want to do anything with the `None` value. i.e. `_ => ()`
+- A shorter way of doing the same
+```rust
+let config_max = Some(3u8);
+if let Some(max) = config_max{
+    println!("The maximum is configured to be {}", max);
+}
+```
+- `if let` takes a pattern and an expression separated by `=`. it works the same way as a match.
+- here the pattern is `Some(max)`, and the max binds to the value inside the `Some`.
+- We can then use `max` in the body of the `if let` block in the same way we used ` max` in the corresponding `match` arm.
+- The code ins the `if let` block isn't run if the value doesn't match the pattern.
+- using `if let` means less typing, less indentation and less boilerplate code..
+- however, you lose the exhaustive checking that `match` enforces. 
+- chosing between `match` and `if let` depends on what you're doing in your particular situation and whether gaining conciseness is an appropiate trade-off for losing exhaustive checking.
+- We can include `else` with an `if let`. The block of code that goes with the `else` block is the smae as the block of code that would with the `_` case in the `match` expression that is equivalent to the `if let` and `else`.
+```rust
+let mut count = 0;
+match coin{
+    Coin::Quater(state)=>println!("State quater from {:?}!", state),
+    _ => count + 1,
+}
+```
+- we can use an `if let` and `else` expression
+```rust
+let mut count = 0;
+if let Coin::Quater(state) = coin{
+    println!("State quater from {:?}!", state);
+}
+else{
+    count += 1;
+}
+```
