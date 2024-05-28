@@ -18,9 +18,83 @@
 - `Binary crates` are programs you can compile to an executable that you can run, such as a command-line program or a server.
 - `Library Crates` don't have `main` function, and they don't compile to an executable.
     - instead they define functionality intended to be shared with multiple projects.
-- The `create root` is a  source file that the Rust comiler starts from and makes up the root module of your crate.
-- A `package` is a bundle of one or more crated that provide a set of functionality.
+- The `create root` is a  source file that the Rust compiler starts from and makes up the root module of your crate.
+- A `package` is a bundle of one or more crates that provide a set of functionality.
 - A package contains a `Cargo.toml` file that describes how to build those crates.
 - Cargo is actually a package that contains the binary crate for the command-line  tool you've  been using to build your code.
 - The Cargo package also containes a library crate that the binary crate depends upon.
+- A package can contain as many as binary crated as you like, but at most only one library crate.
+- A package must contain at least one crate, whether that's a library or binary crate.
+- What happens when we run `cargo new`:
+    - There's a `cargo.toml` file, giving us a package.
+    - There's also a `src` directory that contains main.rs.
+    - in `Cargo.toml` there no mention of `src/main.rs`.
+    - Cargo follows a convention that `src/main.rs` is the crate root of a binary crate with the same name as the package.
+    - Cargo knows that if the package directory contains `src/lib.rs`, the package contains a library crate with the same name as the package and `src/lib.rs` is its crate root.
+    - Cargo passes the crate root files to `rustc` to build the library or binary
+
+## Defining Modules to Control Scope and Privacy
+```
+backyard
+├── Cargo.lock
+├── Cargo.toml
+└── src
+    ├── garden
+    │   └── vegetables.rs
+    ├── garden.rs
+    └── main.rs
+```
+### Modules Cheat Sheet
+- Start from the crate root
+    - while compiling a crate, the compiler first looks in the crate root file (`src/lib.rs` or `src/main.rs`) for code to compile.
+- Declaring Modules: 
+    - in crate root file, we can declare new modules. 
+    - ex: if we want to declare "garden" module with `mod garden`.
+    - The compiler will look for the module's code in these places
+        - inline, within curly brackets that replace the semicolon following `mod garden`
+        - in the file `src/garden/vegetale.rs`
+        - in the file `src/garden/vegetables/mod.rs`
+- Declaring submodules:
+    - in any file other thatn the crate roor, you can declare submodules.
+    - we can declare using `mod vegetables` in `src/garden.rs` . The compiler will look for the submodule's code within the direcoty named for the parent module in these places:
+        - inline, directly following `mod vegetables` within curyl brackets instead of the semicolon
+        - in the file `src/garden/vegetables.rs`
+        - in the file `src/garden/mod.rs`
+- Paths to code in modules:
+    - once a module is part of our code, we can refer to code in that module from anywhere else in that same crate, as long as the privacy rules allow, using the path to the code. 
+    - Example: an `Asparaghus` type in the garden vegetables module would be found at `crate::garden::vegetables::Asparahus`.
+-Private vs Public: 
+    - Code within a module is private from its parent modules by default. 
+    - To make a module public, declate it with `pub mod` instead of `mod`.
+    - To make items within a public module public as well, use `pub` before their declarations
+- The `use` Keyword:
+    - Within a scope, the use keyword creates shortcuts to items to reduce repetition of long paths.
+    - In any scope that can refer to `crate::garden::vegetable::Asparaghus`, you can create a shortcut with `use crate::garden::vegetable::Asparaghus` and then from then on we only need to write `Asparagus` to make use of that type in the scope.
+
+```
+backyard
+├── Cargo.lock
+├── Cargo.toml
+└── src
+    ├── garden
+    │   └── vegetables.rs
+    ├── garden.rs
+    └── main.rs
+```
+- The crate root file in this case in `src/main.rs` and it contains:
+```rust
+use crate::garden::vegetable::Asparagus;
+pub mod garden;
+fn main(){
+    let plant = Asparagus{};
+    println!("I'm growing {:?}!",plant);
+}
+```
+- The `pub mod garden` line tells the compiler to include the code it finds in `src/garden.rs`
+```rust
+pub mod vegetables;
+```
+- Here, `pub mod vegetables;` means the code in `src/garden/vegetable.rs` is included too.
+
+### Grouping Related Code in Modules
 - 
