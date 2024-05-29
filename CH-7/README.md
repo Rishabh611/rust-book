@@ -97,4 +97,48 @@ pub mod vegetables;
 - Here, `pub mod vegetables;` means the code in `src/garden/vegetable.rs` is included too.
 
 ### Grouping Related Code in Modules
-- 
+- modules allow us to control the privacy of items, because code within a module is private by default.
+- Example ofr a library crate which provides a functionality of a restaurant.
+- in restaurant some parts of the a restaurant are reffered to as `front of house` and other as `back of house`.
+- Front of house is where customers are, back of the house is where chefs and cooks work in the kitchen etc.
+```rust
+cargo new restaurant --lib
+```
+- creates a new library named `restaurant`
+- front of the house
+```rust
+mod front_of_house{
+    mod hosting{
+        fn add_to_waitlist(){}
+
+        fn seat_at_table(){}
+    }
+    mod serving{
+        fn take_order(){}
+
+        fn serve_order{}
+
+        fn take_payment{}
+    }
+}
+```
+- we define a module with the name `mod` keyword followed by the name of the module.
+- inside modules, we can place other modules. 
+- by using modules, we can group related definitions together and name why they're related.
+- crate root:  `src/main.rs` and `src/lib.rs` are called crate roots. the contents of either of these two files form a module named `crate` at the root of the create's module structure known as thee module tree.
+```
+ crate
+ └── front_of_house
+     ├── hosting
+     │   ├── add_to_waitlist
+     │   └── seat_at_table
+     └── serving
+         ├── take_order
+         ├── serve_order
+         └── take_payment
+```
+- this tree shows how some of the modules nest inside one another. 
+- if module A is inside of module B we say that the module A is the child of module B.
+
+## Paths for Reffering to an item in the module tree.
+-
