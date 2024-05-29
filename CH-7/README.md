@@ -141,4 +141,55 @@ mod front_of_house{
 - if module A is inside of module B we say that the module A is the child of module B.
 
 ## Paths for Reffering to an item in the module tree.
--
+- To show Rust where to find an item in a module tree, we use a path in the same way we use a path when navigating a file system.
+- A path can take two forms:
+    - An absolute path: full path starting from crate root. it starts with the literal `crate`
+    - A relative path: starts from the current module and uses `self`, `super` or an identifier in the current module.
+- example:
+    - calling `add_to_waitlist` function from a new function `eat_at_restaurant` defined in the crate root.
+```rust
+mod front_of_house{
+    mod hosting{
+        fn add_to_waitlist(){}
+    }
+}
+pub fn eat_at_restaurant(){
+    // Absolute path
+    crate::front_of_house::hosting::add_to_waitlist();
+
+    // Relative path
+    front_of_house::hosting::add_to_waitlist();
+}
+```
+- How to chose whether to use a relative or absolute path.
+    - depends on whether you're more likely to move item definition code separately from or together with the code that uses the item.
+    - If we move the whole module we need to update absolute path but relative path would be valid.
+    - if we move the function to separate module, the path call would stay the same, but the relative path would need to be updated.
+- Preference: in general to specify absolute paths.
+- If we compile the above example, it will fail
+    - The error message say that module `hosting` is private.
+    - Even if we have correct paths for our functions, Rust won't let us use them because it doesn't have access to the private sections.
+    - In Rust all items are private to parent modules by default.
+    - If we want to make an item like a function or struct `private` you put it in a module.
+    - Items in parent can't use the private items inside child modules, but items in child modules can use the item in their ancestor modules.
+    - This is becuase child modules wrap and hide their implementation details, but the child modules can see the context in which they're defines. 
+    - Rust does give you the option to expose inner parts of child modules code to outer ancestor module by using the `pub` keyword to make an item public.
+### Exposing Paths with the `pub` keyword
+- updating the above example
+```rust
+mod front_of_house{
+    pub mod hosting{
+        fn add_to_waitlist(){}
+    }
+}
+pub fn eat_at_restaurant(){
+    //absolute path
+    crate::front_of_house::hosting::add_to_waitlist();
+
+    //relative path
+    front_of_house::hosting::add_to_waitlist();
+}
+```
+- still fails to compile
+- Adding the pub keyword infront of `mod hosting` makes the module public.
+- With this change, if we can access
