@@ -227,4 +227,66 @@ mod back_of_house{
 ```
 
 ### Making Structs and Enums public
-- 
+- We can use `pub` to designate structs and enums public, but if we use `pub` before struct definition, we make the struct public, but the struct's field will still be private. 
+- we can make each field public or not on a case-to-case basis
+- Example
+```rust
+mod back_of_house{
+    pub struct Breakfast{
+        pub toast: String,
+        seasonal_fruit: String,
+    }
+    impl Breakfast{
+        pub fn summer(toast: &str) -> Breakfast{
+            Breakfast{
+                toast: String::from(toast),
+                seasonal_fruit: String::from("Peaches"),
+            }
+        }
+    }
+}
+pub fn eat_at_restaurant(){
+    // Order a breakfast in the summer with Rye Toast
+    let mut meal = back_of_house::Breakfast::summer("rye");
+    // Change our mind about what bread we'd like
+    meal.toast = String::from("Wheat");
+    println!("I'd like {} toast please", meal.toast);
+
+    // The next line won't compile if we uncomment it; we're not allowed to see or modify the seasonal fruit that comes
+    // with the meal
+    // meal.seasonal_fruit = String::from("blueberries");
+}
+```
+- we cannot use the `seasonal_fruit` field in `eat_at_restaurant` because `seasonal_fruit` is private.
+- `back_of_house::Breakfast` has a private field, the struct needs to provide a public associated function that constructs an instance of `Breakfast`
+- If we make an enum public, all of it's variants are then public.
+- Example
+```rust
+mod back_of_house{
+    pub enum Appetizer{
+        Soup,
+        Salad,
+    }
+}
+pub fn eat_at_restaurant(){
+    let order1 = back_of_house::Appetizer::Soup;
+    let order2 = back_of_house::Appetizer::Salad;
+}
+```
+
+## Bringing paths into scope with the `use` keyword
+- Whether we chose the absolute or relative path, every time we have specify some path.
+- We can create a shortcut to a path with the `use` keyword once, and then use the shorter name everywhere else in the scope.
+- Example:
+```rust
+mod front_of_house{
+    pub mod hosting{
+        pub fn add_to_waitlist(){}
+    }
+}
+use crate::front_of_house:::hosting
+pub fn eat_at_restaurant(){
+    hosting::add_to_waitlist();
+}
+```
+- By adding 
