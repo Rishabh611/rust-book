@@ -192,4 +192,39 @@ pub fn eat_at_restaurant(){
 ```
 - still fails to compile
 - Adding the pub keyword infront of `mod hosting` makes the module public.
-- With this change, if we can access
+- With this change, if we can access `front_of_house`, we can access `hosting`. 
+- But contents of hosting are still private, making the module public doesn't make it's content public.
+- the `pub` keyword on a module only lets code in it's ancestor module refer to it, not access it's inner code. 
+- need to make `add_to_waitlist` public
+```rust
+mod front_of_house{
+    pub mod hosting{
+        pub fn add_to_waitlist(){}
+    }
+}
+pub fn eat_at_restaurant(){
+    //absolute path
+    crate::front_of_house::hosting::add_to_waitlist();
+
+    //relative path
+    front_of_house::hosting::add_to_waitlist();
+}
+```
+- while `front_of_house` isn't public, because the `eat_at_restaurant` function is defined in the same module as `front_of_house` from `eat_at_restaurant`, so the relative path starting from the module in which `eat_at_restaurant`is defined works.
+
+### Starting Relative paths with `super`
+- We can construct relative paths that begin in the parent module, rather than the current module or the crate root, by using `super` at the start of the path.
+- Example:
+```rust
+fn deliver_order(){}
+mod back_of_house{
+    fn fix_incorrect_order(){
+        cook_order();
+        super::deliver_order();
+    }
+    fn cook_order(){};
+}
+```
+
+### Making Structs and Enums public
+- 
