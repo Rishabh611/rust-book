@@ -289,4 +289,135 @@ pub fn eat_at_restaurant(){
     hosting::add_to_waitlist();
 }
 ```
-- By adding 
+- `use` only created the shortcut for the particular scope in which `use` occurs.
+```rust
+mod front_of_house{
+    pub mod hosting{
+        pub fn add_to_waitlist(){}
+    }
+}
+use crate::front_of_house::hosting;
+mod customer{
+    pub fn eat_at_restaurant(){
+        hosting::add_to_waitlist();
+    }
+}
+```
+- Above example will fail to compile, since shortcut no longer applied within `customer` module
+- to fix this
+    - move the `use` within the `customer` module
+    - reference the shortcut in the parent module with `super::hosting` within the child `customer` module.
+
+### Creating Idiomatic use Paths
+- We bring the function's parent module into scope with `use`, means we have to specify parent modules when calling the function.
+- Specifying the parents module when calling the function makes it clear that the function isn't locally defined while minimizing repetetion of full path.
+```rust
+mod front_of_house{
+    pub mod hosting{
+        pub fn add_to_waitlist(){}
+    }
+}
+use crate::front_of_house::hosting::add_to_waitlist;
+pub fn eat_at_restaurant(){
+    add_to_waitlist();
+}
+```
+- Here it's unclear as to where `add_to_waitlist` is defined.
+- When bringing in stucts, enums and other items with `use`, it's idiomatic to specify the full path.
+```rust
+use std::collections::HashMap;
+
+fn main(){
+    let mut map = HashMap::new();
+    map.insert(1,2);
+}
+```
+- this is just a convention.
+- if we're bringing two items with the same name into scope with `use` statements, Rust won't allow that.
+```rust
+use std::fmt;
+use std::io;
+
+fn function1()->fmt::Result{
+    //
+}
+fn function2()->io::Result{
+    // 
+}
+```
+### Providing new names with the `as` keyword
+- We can specify `as` and a new local name or `alias` for the tupe.
+```rust
+use std::fmt::Result;
+use std::io::Result as IoResult;
+fn function1()->Result{
+    //
+}
+fn function2()->IoResult{
+    
+}
+```
+### Re-exporting names with `pub use`
+- When we bring a name into scope with the `use` keyword, the name avialable in the new scope is private.
+- to enable the code that calls our code to refer to that name as if it had been defined in that code's scope, we can combine `pub` and `use`.
+- This is called re-exporting.
+```rust
+// restaurant.rs
+mod front_of_house{
+    pub mod hosting{
+        pub fn add_to_waitlist(){}
+    }
+}
+
+pub use crate::front_of_house::hosting;
+
+pub fn eat_at_restaurant(){
+    hosting::add_to_waitlist();
+}
+```
+- Before this change, we would call add_to_waitlist function by using the path `restaurant::front_of_house::hosting::add_to_waitlist()`
+- with the use of `pub use` we can use the path `restaurant::hosting::add_to_waitlist()`
+
+### Using External Packages
+- Take example for using `rand`
+- Steps to use `rand`
+    1. add rand in `cargo.toml` as `rand = "0.8.5"`
+    2. Bring `rand` definitions into the scope of our package, we added a `use` line starting with the name of the crate and listed the items we wanted to bring into scope.
+    ```rust
+    use rand::Rng;
+    fn main(){
+        let secret_number = rand::thread_rng().gen_range(1..=100);
+    }
+    ```
+- `std` library is also a crate external to our package. But it's shipped with Rust language, we don't need to change `cargo.toml` to include `std`
+
+### Using Nested Paths to clean up Large `use` lists
+- when importing multiple items defined in the same crate or same module, listing each item on it's own line can take too much space.
+```rust
+use std::cmp::ordering;
+use std::io;
+```
+- We can use nested paths to bting same items into scope in one line
+```rust
+use std::{cmp::ordering, io};
+```
+- this can reduce number of separate `use` statements
+```rust
+use std::io;
+use std::io::write;
+```
+- here common path is `std::io`, to merge these two paths, we can use `self` in the nested path;
+```rust
+use std::io::{self, write};
+```
+
+### The Glob Operator
+- If we want to bring `all` public items in a path into scope, we can specify that path followed by the `*` glob operator
+```rust
+use std::collections::*;
+```
+- Glob can make it harder to tell what names are in scope and where a name used in your program was defined.
+- The glob operator is ofter used when testing to bring everything under tests into `tests` module.
+
+## Separating Modules into different files
+-

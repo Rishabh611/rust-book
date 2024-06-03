@@ -11,5 +11,9 @@ name = "ex-9-area-of-rectangle"
 version = "0.1.0"
 
 [[package]]
+name = "restaurant"
+version = "0.1.0"
+
+[[package]]
 name = "rust-book"
 version = "0.1.0"
