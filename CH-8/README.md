@@ -75,3 +75,48 @@ println!("The first element is: {first}");
 - this error is due to the way vectors work: because vectors put the values next to each other in memory, adding a new element onto the end of the vector might require allocating the new memory and copying the old elements to the new space, if there isn't enough room to put all the elements next to each other where vector is currently stored.
 - in that case, the reference to the first element would be pointing to deallocated memory.
 - The borrowing role prevents programs from ending up in that situation.    
+
+### Iterating over the values in a Vector
+```rust
+let v = vec![100,32,57];
+for i in &v{
+    println!("{i}");
+}
+```
+- above loop get immutable references to each element in a vector of `i32` values
+```rust
+let mut v = vec![100,32,57];
+for i in &mut v{
+    *i += 50;
+}
+```
+- We have to use `*` to dereference to get the valur in `i`.
+
+### Using an Enum to Store Multiple Types
+- Vectors can only store values that are the same type.
+- If we need to one type to represent elements of different types, we can define and use an enum
+```rust
+enum SpreadsheetCell{
+    Int(i32),
+    Float(f64),
+    Text(String),
+}
+
+let row = vec![
+    SpreadsheetCell::Int(3),
+    SpreadsheetCell::Text(String::from("blue")),
+    SpreadsheetCell::Float(1.12),
+]
+```
+- Rust needs to know what types will be in the Vector at compile time so it knows exavtly how much memory on head will be needed to store each element.
+- We must also be explicit about what types are allowed in this vector.
+- If Rust allowed a vector to hold any type, there would be a change that one or more of the types would cause errors with the operations performed on the elements of the vector.
+- Using an enum plus a `match` means that Rust will ensure at compile time that every possible case is handled.
+
+### Dropping a Vector Drops its elements
+```rust
+{
+    let v = vec![1,2,3,4,5];
+    // do stuff with v
+} // <- v goes out of scope and is freed here.
+```
