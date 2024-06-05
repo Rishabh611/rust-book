@@ -127,4 +127,39 @@ let row = vec![
 - Rust has only one String type in the core language, which is the string slice `str` that is usually seen in it's borrowed form `&str`.
 - String literals, are stored in the program's binary and are therefore string slices.
 - The `String` type, which is provided by Rust's standard library rather than coded into the core langauge is a growable, mutable, owned, UTF-8 encoded String type.
-- 
+
+### Creating a new String
+- Many of the same operations available with `Vec<T>` are available with `String` as well.
+- String is actually implemented as a wrapper around a vectory of bytes with some extra guarantees, restrictions, and capabilities.
+```rust
+let mut s = String::new();
+```
+```rust
+let data = "initial contents";
+let s = date.to_string();
+
+// the method also works on a literal  directly:
+let s = "initial contents".to_string();
+```
+```rust
+let s = String::from("initial contents");
+```
+### Updating a String
+- We can use `+` operator or the `format!` mactor to concatenate `String` values.
+#### Appending to a String with `push_str` and `push`
+```rust
+let mut s = String::from("foo");
+s.push_str("bar");
+```
+- the `push_str` method takes a string slice because we don't necessarily want to take ownership of the parameter.
+```rust
+let mut s1 = String::from("foo");
+let s2 = "bar";
+s1.push_str(s2);
+println!("s2 is {s2}");
+```
+- the `push` method takes a single character as a parameter and adds it to the sting
+```rust
+let mut s = String::from("lo");
+s.push('l');
+```
