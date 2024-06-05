@@ -120,3 +120,11 @@ let row = vec![
     // do stuff with v
 } // <- v goes out of scope and is freed here.
 ```
+
+## Storing UTF-8 Encoded Text with String
+
+### What is a String?
+- Rust has only one String type in the core language, which is the string slice `str` that is usually seen in it's borrowed form `&str`.
+- String literals, are stored in the program's binary and are therefore string slices.
+- The `String` type, which is provided by Rust's standard library rather than coded into the core langauge is a growable, mutable, owned, UTF-8 encoded String type.
+- 
