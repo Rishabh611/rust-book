@@ -163,3 +163,17 @@ println!("s2 is {s2}");
 let mut s = String::from("lo");
 s.push('l');
 ```
+#### Concatenation with the + operator or the `format!` macro
+```rust
+let s1 = String::from("Hello, ");
+let s2 = String::from("world!");
+let s3 = s1 + &s2; // note s1 has been moved here and can no longer be used.
+```
+- The `+` operator uses the `add` method, whose signature looks like this:
+```rust
+fn add(self, s:&str) -> String{
+
+}
+```
+- First `s2` has an `&`, meaning we're adding a reference of the second string to the first string.
+- This is because of the `s` parameter in the `add` function: we can only add a `&str` to a `String`; we can't add two `string` values together.
