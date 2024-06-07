@@ -177,3 +177,7 @@ fn add(self, s:&str) -> String{
 ```
 - First `s2` has an `&`, meaning we're adding a reference of the second string to the first string.
 - This is because of the `s` parameter in the `add` function: we can only add a `&str` to a `String`; we can't add two `string` values together.
+- But type of `&s2`is `&String` in the above example, not `&str`. How can this compile?
+- Compiler is able to `coerce` the `&String` argument into `&str`. 
+- when we call `add` method, Rust uses a deref coercion which here turns `&s2` into `&s2[..]`
+- But `add` does not take ownership of the `s` parameter, `s2` will 
