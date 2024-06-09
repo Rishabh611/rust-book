@@ -278,3 +278,115 @@ for b in "Зд".bytes(){
     println!("{b}");
 }
 ```
+
+## Storing Keys with Associated value in HashMaps
+### Creating a new HashMap
+- We can create hashmap using `new` and add new elements with  `insert`
+```rust
+use std::collections::HashMap;
+let mut scores = HashMap::new();
+scores.insert(String::from("Blue"), 10);
+scores.insert(String::from("Yellow"), 50);
+```
+- HashMap is less frequently used so it's not included in the prelude.
+- HashMaps have less support from the standard library; there is not built in macro to construct them.
+- HashMaps store their data on the heap
+
+### Accessing Values in a HashMap
+- We can get value out of HashMap by providing it's key to the `get` method.
+```rust
+use std::collections::HashMap;
+let mut scores = HashMap::new();
+scores.insert(String::from("Blue"), 10);
+scores.insert(String::from("Yellow"), 50);
+
+let team_name = String::from("Blue");
+let score = scores.get(&team_name).copied().unwrap_or(0);
+```
+- score will have value that's associated with the blue team, and the result will be `10`.
+- The `get` method returns an `Option<&V>`
+- if there is no value in `scores` it will return `None`
+- The program handles the `Option` by calling `copied` to get an `Option<i32>` rather than a `Option<&i32>`, then `unwrap_or`  to set `score` to zero if scores doesn't have an entry for the key.
+- we can iterate over a hash map (key/value) pair using a `for` loop
+```rust
+use std::collections::HashMap;
+let mut scores = HashMap::new();
+scores.insert(String::from("Blue"), 10);
+scores.insert(String::from("Yellow"), 50);
+
+for (key, value) in &scores{
+    println!("{key}: {scores}");
+}
+```
+
+### HashMaps and ownership
+- For types that implement `Copy` trait, like `i32`, the values are copied to the HashMap.
+- For owned values like `String`, the values will be moved and the HashMap will be the owner of the values.
+```rust
+use std::collections::HashMap;
+
+let field_name = String::from("Favourite Color");
+let field_value = String::from("Blue");
+
+let mut map = HashMap::new();
+map.insert(field_name, field_value);
+
+// field_name and field_value are invalid at this point.
+```
+
+### Updating the HashMap
+#### Overwriting the values
+```rust
+use std::collections::HashMap;
+
+let mut scores = HashMap::new();
+
+scores.insert(String::from("Blue"), 10);
+scores.insert(String::from("Blue"), 50);
+
+println!("{:?}", scores);
+```
+- This code will print `Blue: 50`, original value will be overwritten.
+
+#### Adding a value only if the key doesnot exist
+```rust
+use std::collections::HashMap;
+
+let mut scores = HashMap::new();
+scores.insert(String::from("Blue"), 10);
+
+scores.entry(String::from("Yellow")).or_insert(50);
+scores.entry(String::from("Blue")).or_insert(50);
+
+println!("{:?}" scores);
+```
+- HashMaps have a special API `entry` that takes the key you want to check as a parameter/
+- The return values of `entry` method is an `Enum` called `Entry` that represents a value that might or might not exist.
+- The `or_insert` method on `Entry` is defined to return a mutable reference to the value for the corresponding `Entry` key if the key exists, and if not, inserts the parameter as the new value for this key and return a mutable reference to the new value. 
+- The above code will print `{Yellow: 50, Blue: 50}
+
+#### Updating value based on old values
+```rust
+use std::collections::HashMap;
+
+let text = "hello world wonderful world";
+
+let mut map = HashMap::new();
+
+for word in text.split_whitespace(){
+    let count = map.entry(word).or_insert(0);
+    *count += 1;
+}
+
+println!("{:?}", map);
+```
+- This code will print `{hello:1, world:2, wonderful:1}`
+- The `split_whitespaces` returns a iterator over sub-slices, separated by whitespace of the values of text.
+- The `or_insert` function return a mutable reference (`&mut v`) to the value for the specified key. 
+- here we store that mutable reference in the `count` variable, so in order to assign that value we must need to dereference count using `*`
+
+### Hashing Functions
+- By default, `HashMap` uses a hashing function called `SipHash` that can provide resistance to Denial of Service(DoS) attacks involving Hash Tables. 
+- This is not the fastest hashing algorithm but trade of for better security that comes with the drop in preformance is worht it.
+- if you find that the default hashing function is too slow for your purposes, we can switch  to another function by specifying a different hasher. 
+- A `hasher` is type that implements the `BuiltHasher` trait.
