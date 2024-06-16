@@ -199,3 +199,75 @@ fn read_username_from_file() -> Result<String, io::Error> {
     fs::read_to_string("hello.txt")
 }
 ```
+
+### Where the `?` operator can be used
+- The `?` operator can only be used in functions whose return type is compatible with the value the `?` is used on.
+- Because the `?` operator is defined to perform an early return of a value out of the function. 
+- IF we use `?` operator in main function 
+```rust
+use std::fs::File;
+fn main(){
+    let greeting_file = File::open("hello.txt")?;
+}
+```
+- The operator `?` follows the `Result` value returned by `File::open`, but this `main` function has the return type of `()` not `Result` we will get error.
+- The error points out that we're only allowed to use the `?` operator in a function that returns `Result`, `Option`, or another type that implements `FromResidual`
+- Two ways of handling the error
+    1. Change the return type of your function to be compatible with the value you're using the `?` operator.
+    2. Use a `match` or one of the `Result<T, E>` methods to handle the `Result<T, E>` in whatever way possible.
+- `?` operator can also be used with `Option<T>` values, we can use `?` on only on `Option<T>` in a function that returns an `Option`
+- The behaviour of `?` operator when called on an `Option<T>` is similar to it's behaviour when called on a `Result<T, E>`
+    - if the value is `None`, the `None` will be returned early from the function at that point.
+    - if the value is `Some`, the value inside `Some` is the resulting value of the expression and the function continues
+- Example
+```rust
+fn last_char_of_first_line(text: &str) -> Option<char> {
+    text.lines().next()?.chars().last()
+}
+```
+- This function returns `Option<char>` because it's possible that there is a character there, but it's also possible that there isn't. 
+- It takes `text` string slice argument and calls the `lines` method on it, which returns an iterator over the lines in the string.
+- We want to examine the first line, we call the `next` on the iterator to get teh first value from the iterator.
+- if the `text` is empty string, this call to `next` will return `None` in which case we use `?` to stop and return `None` from the function.
+- if `text` is not the empty string, `next` will return a `Some` value containing a string slice of the first line in `text`
+- The `?` extracts the string slice, and we can call `chars` on the string slice to get an iterator of it's characters.
+- We call `last` to return the last item in the iterator.
+- We can use the `?` operator on a `Result` in a function that returns `Result` and we can use `?` operatoe  on a option in a function that returns `Option`, but we cannot mix and match.
+- The `main` function can also return a `Result<(), E>`
+```rust
+use std::error::Error;
+use std::fs::File;
+
+fn main() -> Result<(), Box<dyn Error>> {
+    let greeting_file = File::open("hello.txt")?;
+
+    Ok(())
+}
+```
+- `Box<dtn Error>` mean "any kind of error"
+- using `?` on a `Result` value in `main` function with the error type `Box<dyn Error>` is allowed, because it allows any `Err` value to be returned early. 
+- Even though the body of this `main` function will only ever return errors of type `std::io::Error`, by specifying `Box<dyn Error>` this signature will continue to be correct even if more code that return other error is added to the body of main.
+- When a `main` function returns a `Result<(), E>` the executable will exit with a value of `0` if `main` returns `Ok(())` and will exit with a nonzere value if `main` returns an `Err` value
+
+## To `panic` or not to `panic`
+- when code panics there is no way to return.
+- when you chose to return a `Result` value, you give calling code options. 
+- The calling code could chose to attempt to recover in a way that's appropiate for it's situation, or it could decide that an `Err` value in this case in unrecoverable, so it can call `panic!` and turn your recoverable code into unrecoverable one.
+- Returning `Result` is a good default choice when you're defining a function that might fail.
+
+### Examples, Prototype Code and Tests
+- When we are writing an example to illustrate some concept, also including robust error-handling code can make the examples less clear.
+- `unwrap` and `expect` methods are very handy when prototyping, before you're ready to decide how to handle errors. They leave clear markers in your code for when you're ready to make your program more robust.
+- if a method call fails in a test, you'd want the whole test to fail, even if that method isn't the functionality under test. Because `panic!` is how a test is marked as failure, calling `unwrap` or `expect` is exactly what should happen.
+
+### Cases in which you have more information than the compiler
+- it would be appropiate to call `unwrap` or `expect` when you have some other logic that ensures the `Result` will have an `Ok` value, but the logic isn't something that compiler understands
+- If we can ensure by manually inspecting the code that we'll never have an `Err` variant, it perfectly acceptable to call `unwrap` and better to call `expect` with the reason that this won't fail.
+```rust
+use std::net::IpAddr;
+
+let home : IpAddr = "127.0.0.1"
+                    .parse()
+                    .expect("Hardcoded IP Address should be valid")
+
+```
