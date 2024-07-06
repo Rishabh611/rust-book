@@ -3,11 +3,27 @@
 version = 3
 
 [[package]]
+name = "adder"
+version = "0.1.0"
+
+[[package]]
 name = "ex-10"
 version = "0.1.0"
 
 [[package]]
 name = "ex-9-area-of-rectangle"
+version = "0.1.0"
+
+[[package]]
+name = "greeting"
+version = "0.1.0"
+
+[[package]]
+name = "guess"
+version = "0.1.0"
+
+[[package]]
+name = "rectangle"
 version = "0.1.0"
 
 [[package]]

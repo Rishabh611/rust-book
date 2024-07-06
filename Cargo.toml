@@ -1,4 +1,4 @@
-workspace = { members = [ "CH-5/ex-10","CH-5/ex-9-area-of-rectangle", "CH-7/restaurant"] }
+workspace = { members = [ "CH-11/adder", "CH-11/greeting", "CH-11/guess", "CH-11/rectangle", "CH-5/ex-10","CH-5/ex-9-area-of-rectangle", "CH-7/restaurant"] }
 [package]
 name = "rust-book"
 version = "0.1.0"
