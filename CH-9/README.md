@@ -271,3 +271,12 @@ let home : IpAddr = "127.0.0.1"
                     .expect("Hardcoded IP Address should be valid")
 
 ```
+
+### Guidelines for Error Handling
+- Need to let our code `panic` if our code is in bad state.
+- If someone calls our code and passes in values that don't make sense, it's best to return error if we can so the user of the library can decide what they want to do in that case.
+- However, in cases where continuing  could be insecure or harmful, the best choice is to call `panic!` and alert the person using our library to the bug in their code so they can fix it.
+- `panic!`  is also appropiate if you're calling external code that is out of our control and it returns an invalid state that we have no way of fixing.
+- When failure is expected, it makes sense to return `Result` than to return `panic!`. This represents that failure is expected and calling code must decide how to handle.
+- Functions often have `contracts`, their behaviour is guaranteed if the inputs meet particular requirements.
+- Paniking when the contract is voilated makes sense because contract voilation always indicate caller side bug and it's not a kind of an error which we want the calling code to have explicitly handled.
